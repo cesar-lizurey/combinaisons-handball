@@ -26,10 +26,8 @@ jobs:
       - name: Vérifier les données
         run: node tools/verifier.js
 
-      - name: Préparer le site
-        run: |
-          mkdir _site
-          cp -r index.html css js _site/
+      - name: Générer le site (une page par combinaison et sitemap)
+        run: node tools/generer.js _site
 
       - uses: actions/configure-pages@v5
 

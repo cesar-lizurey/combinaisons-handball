@@ -478,7 +478,7 @@
       for (const c of items.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))) {
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `#${c.id}`;
+        a.href = lien(c.id);
         a.dataset.id = c.id;
         a.textContent = c.nom;
         if (c.fiabilite !== 'sourcee') {
@@ -577,8 +577,37 @@
     }
   }
 
+  /* ---------------- Adresses ---------------- */
+
+  // En ligne, chaque fiche a sa propre page (c/<id>/, générée par tools/generer.js) et l'on
+  // navigue sans recharger grâce à l'historique. En local (file://), on navigue par #id.
+  const enLigne = /^https?:$/.test(location.protocol);
+  const RACINE = new URL(document.body.dataset.racine || './', location.href).href;
+  const adresse = id => {
+    if (id === 'a-propos') return `${RACINE}a-propos/`;
+    return id ? `${RACINE}c/${encodeURIComponent(id)}/` : RACINE;
+  };
+  const lien = id => (enLigne ? adresse(id) : `#${id}`);
+
+  function routeCourante() {
+    if (location.hash.length > 1) return decodeURIComponent(location.hash.slice(1));
+    const chemin = location.href.startsWith(RACINE) ? location.href.slice(RACINE.length).split(/[?#]/)[0] : '';
+    const m = chemin.match(/^c\/([^/]+)/);
+    if (m) return decodeURIComponent(m[1]);
+    return /^a-propos/.test(chemin) ? 'a-propos' : '';
+  }
+
+  function naviguer(id) {
+    if (enLigne) {
+      history.pushState(null, '', adresse(id));
+      apresNavigation();
+    } else {
+      location.hash = id;
+    }
+  }
+
   function router() {
-    const id = location.hash.slice(1);
+    const id = routeCourante();
     const aPropos = id === 'a-propos';
     vueFiche.hidden = aPropos;
     vueAPropos.hidden = !aPropos;
@@ -612,10 +641,25 @@
   // Choisir une fiche (même celle déjà affichée) referme la liste.
   $('#menu').addEventListener('click', e => { if (e.target.closest('a')) fermerMenu(); });
 
-  window.addEventListener('hashchange', () => {
+  function apresNavigation() {
     fermerMenu();
     router();
     if (mobile()) window.scrollTo(0, 0);
+  }
+
+  // Liens internes: liste des fiches, titre du site, page "À propos".
+  document.querySelectorAll('[data-route]').forEach(a => { a.href = lien(a.dataset.route); });
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-id], a[data-route]');
+    if (!a || !enLigne || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    naviguer(a.dataset.id !== undefined ? a.dataset.id : a.dataset.route);
+  });
+  window.addEventListener('popstate', apresNavigation);
+  window.addEventListener('hashchange', () => {
+    // Anciennes adresses en #id: en ligne, on les remplace par l'adresse de la page.
+    if (enLigne) history.replaceState(null, '', adresse(routeCourante()));
+    apresNavigation();
   });
 
   document.addEventListener('keydown', e => {
@@ -632,5 +676,6 @@
   construireListe();
   majLibelles();
   remplirAPropos();
+  if (enLigne && location.hash.length > 1) history.replaceState(null, '', adresse(routeCourante()));
   router();
 })();

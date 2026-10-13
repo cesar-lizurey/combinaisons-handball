@@ -16,7 +16,7 @@ Le répertoire compte 370 combinaisons et plus de 1 000 variantes, issues de sou
 - Défense affichable ou masquable (0-6, 5-1, 3-2-1, 4-2, individuelle), tracés des étapes précédentes.
 - Situations de supériorité ou d'infériorité numérique (joueurs exclus) et de jeu à 7 contre 6.
 - Variantes pour certaines combinaisons (par exemple les quatre fins de l'Espagnole).
-- Lien direct vers une combinaison: `.../#yago`, `.../#espagnole`, etc.
+- Une page par combinaison, avec sa propre adresse: `.../c/yago/`, `.../c/espagnole/`, etc. (les anciens liens en `#yago` restent valables).
 
 ## Lancer en local
 
@@ -24,9 +24,13 @@ Le site est statique, sans dépendance ni compilation: ouvrez `index.html` dans 
 
 ## Déploiement sur GitHub Pages
 
-Le workflow [.github/workflows/pages.yml](.github/workflows/pages.yml) publie le site à chaque push sur `main`.
+Le workflow [.github/workflows/pages.yml](.github/workflows/pages.yml) publie le site à chaque push sur `main`. Il vérifie les données, puis [tools/generer.js](tools/generer.js) produit une page HTML par combinaison (contenu lisible par les moteurs de recherche), la page "À propos" et `sitemap.xml`. Pour tester le résultat en local: `node tools/generer.js _site`, puis servir le dossier `_site` avec un petit serveur web.
 
 À faire une seule fois: dans le dépôt GitHub, ouvrez **Settings vers Pages**, puis choisissez **GitHub Actions** dans **Build and deployment vers Source**.
+
+## Référencement (Google, Bing)
+
+Le sitemap est publié à l'adresse `https://cesar-lizurey.github.io/combinaisons-handball/sitemap.xml`. Il faut le déclarer une fois dans [Google Search Console](https://search.google.com/search-console) et [Bing Webmaster Tools](https://www.bing.com/webmasters). Pour prouver la propriété du site, déposer à la racine du dépôt le fichier de validation fourni (`googleXXXX.html` ou `BingSiteAuth.xml`): le générateur le publie automatiquement.
 
 ## Ajouter ou modifier une combinaison
 

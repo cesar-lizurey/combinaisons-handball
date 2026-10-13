@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Combinaisons de handball</title>
+  <meta name="description" content="Répertoire des combinaisons d'attaque en handball, avec schémas animés étape par étape.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23e8590c'/><path d='M4 16h24M16 2c5 4 5 24 0 28M16 2c-5 4-5 24 0 28' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="entete">
+    <button type="button" id="ouvrir-menu" class="bouton-menu" aria-controls="menu" aria-expanded="false">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+      Combinaisons
+    </button>
+    <h1><a href="./">Combinaisons de handball</a></h1>
+    <div class="options">
+      <a class="lien-a-propos" href="#a-propos">À propos</a>
+      <div class="bascule" role="group" aria-label="Libellés des joueurs">
+        <button type="button" data-libelles="postes">AiG - Piv</button>
+        <button type="button" data-libelles="numeros">1 - 2 - 3</button>
+      </div>
+      <label class="case"><input type="checkbox" id="opt-defense"> Défense</label>
+      <label class="case"><input type="checkbox" id="opt-traces"> <span class="long">Tracés précédents</span><span class="court">Tracés</span></label>
+    </div>
+  </header>
+
+  <div class="mise-en-page">
+    <nav class="menu" id="menu" aria-label="Combinaisons">
+      <div class="menu-entete">
+        <span>Combinaisons</span>
+        <button type="button" id="fermer-menu" aria-label="Fermer la liste">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg>
+        </button>
+      </div>
+      <input type="search" id="recherche" placeholder="Rechercher..." aria-label="Rechercher une combinaison">
+      <select id="filtre-defense" aria-label="Filtrer par défense">
+        <option value="">Toutes les défenses</option>
+      </select>
+      <select id="filtre-fiabilite" aria-label="Filtrer par fiabilité">
+        <option value="">Toutes les fiabilités</option>
+        <option value="sourcee">Sourcées</option>
+        <option value="partielle">Partiellement sourcées</option>
+        <option value="a-verifier">À vérifier</option>
+      </select>
+      <p id="compteur-liste" class="compteur-liste"></p>
+      <div id="liste"></div>
+      <a class="lien-a-propos-menu" href="#a-propos">À propos du site</a>
+    </nav>
+
+    <main class="contenu">
+      <div id="vue-fiche">
+      <div class="titre-bloc">
+        <h2 id="titre"></h2>
+        <p id="alias" class="alias"></p>
+        <div id="meta" class="meta"></div>
+        <p id="resume" class="resume"></p>
+      </div>
+
+      <section class="carte schema-carte" aria-label="Schéma animé">
+        <div id="variantes" class="variantes" role="group" aria-label="Variantes"></div>
+        <svg id="schema" viewBox="-10.8 -1.8 21.6 14.4" role="img" aria-label="Schéma de la combinaison sur un demi-terrain"></svg>
+        <p id="texte-etape" class="texte-etape" aria-live="polite"></p>
+        <div class="controles">
+          <button type="button" id="debut" aria-label="Revenir au début" title="Début (Origine)">⏮</button>
+          <button type="button" id="precedent" aria-label="Étape précédente" title="Étape précédente (flèche gauche)">◀◀</button>
+          <button type="button" id="lecture" class="principal" aria-label="Lecture" title="Lecture / pause (Espace)">▶</button>
+          <button type="button" id="suivant" aria-label="Étape suivante" title="Étape suivante (flèche droite)">▶▶</button>
+          <button type="button" id="fin" aria-label="Aller à la fin" title="Fin (Fin)">⏭</button>
+          <span id="compteur" class="compteur"></span>
+          <label class="vitesse">Vitesse
+            <select id="vitesse">
+              <option value="0.5">x0,5</option>
+              <option value="1">x1</option>
+              <option value="1.5">x1,5</option>
+              <option value="2">x2</option>
+            </select>
+          </label>
+        </div>
+        <input type="range" id="curseur" min="0" max="1" step="0.001" value="0" aria-label="Position dans l'animation">
+        <ul class="legende">
+          <li><span class="sym att"></span> Attaquant</li>
+          <li><span class="sym def"></span> Défenseur (1 à 3 de l'extérieur vers le centre, A = avancé)</li>
+          <li><svg viewBox="0 0 30 10"><line x1="1" y1="5" x2="24" y2="5" class="l-course"/><path d="M22 1 L29 5 L22 9z" class="l-course-f"/></svg> Course</li>
+          <li><svg viewBox="0 0 30 10"><line x1="1" y1="5" x2="24" y2="5" class="l-passe"/><path d="M22 1 L29 5 L22 9z" class="l-passe-f"/></svg> Passe</li>
+          <li><svg viewBox="0 0 30 10"><line x1="1" y1="5" x2="24" y2="5" class="l-tir"/><path d="M22 1 L29 5 L22 9z" class="l-tir-f"/></svg> Tir</li>
+          <li><svg viewBox="0 0 30 10"><line x1="1" y1="5" x2="26" y2="5" class="l-course"/><line x1="26" y1="0" x2="26" y2="10" class="l-ecran"/></svg> Écran</li>
+        </ul>
+        <ul id="legende-postes" class="legende-postes"></ul>
+      </section>
+
+      <div class="grille">
+        <section class="carte">
+          <h3>Description</h3>
+          <div id="description"></div>
+          <h3>Objectif</h3>
+          <p id="objectif"></p>
+          <h3>Points clés</h3>
+          <ul id="points"></ul>
+          <h3>Sources</h3>
+          <p id="fiabilite-texte" class="fiabilite-texte"></p>
+          <ul id="sources" class="sources"></ul>
+        </section>
+        <section class="carte">
+          <h3>Étapes</h3>
+          <ol id="etapes" class="etapes"></ol>
+        </section>
+      </div>
+      </div>
+
+      <article id="vue-a-propos" class="a-propos" hidden>
+        <h2>À propos</h2>
+        <p class="resume">Ce site recense les combinaisons d'attaque placée du handball, avec pour chacune une description, ses variantes et un schéma animé étape par étape.</p>
+
+        <div class="stats" aria-label="Contenu du site">
+          <div><b data-stat="fiches"></b><span>combinaisons</span></div>
+          <div><b data-stat="variantes"></b><span>variantes</span></div>
+          <div><b data-stat="sourcees"></b><span>suivent une source pas à pas</span></div>
+          <div><b data-stat="liens"></b><span>pages citées en source</span></div>
+        </div>
+
+        <section class="carte">
+          <h3>Ce que contient le site</h3>
+          <p>Les combinaisons sont rangées en <span data-stat="categories"></span> catégories: croisés, jeu avec le pivot, écrans et blocs, ailiers, circulation, systèmes complets, combinaisons à nom de pays, jeu contre les défenses 5-1, 3-2-1 et 4-2 et contre une défense individuelle, jets francs et remises en jeu, supériorité numérique (dont le 7 contre 6) et infériorité numérique.</p>
+          <p>Beaucoup de combinaisons ont plusieurs fins: elles apparaissent en variantes au-dessus du schéma. Certaines variantes jouent contre une autre défense ou partent d'un autre porteur que la variante 1.</p>
+        </section>
+
+        <section class="carte">
+          <h3>Lire un schéma</h3>
+          <ul>
+            <li>Le but est en haut. La gauche et la droite sont celles des attaquants, qui font face au but.</li>
+            <li>Les attaquants sont des ronds orange. Les libellés sont au choix, en haut de la page: postes (AiG, ArG, DC, ArD, AiD, Piv) ou numéros (1 ailier gauche, 2 arrière gauche, 3 demi-centre, 4 arrière droit, 5 ailier droit, 6 pivot; 7 pour le 7e joueur de champ).</li>
+            <li>Les défenseurs sont des triangles, numérotés de 1 (extérieur) à 3 (centre) de chaque côté. "A" désigne l'avancé d'une défense 5-1 ou 3-2-1, ou les deux avancés d'une 4-2. Dans les textes, "le 2 gauche" est le défenseur numéro 2 situé à la gauche de l'attaque.</li>
+            <li>Flèche pleine: course. Flèche en tirets bleus: passe. Flèche rouge: tir. Trait en T au bout d'une course: écran ou bloc.</li>
+            <li>Les commandes sous le schéma permettent de lire, de mettre en pause, d'avancer ou de reculer d'une étape, et le curseur de rembobiner. Au clavier: Espace, flèche gauche et flèche droite. Cliquer sur une étape de la liste la rejoue.</li>
+            <li>Les joueurs exclus (supériorité ou infériorité numérique) ne sont pas affichés.</li>
+          </ul>
+        </section>
+
+        <section class="carte">
+          <h3>Fiabilité des fiches</h3>
+          <p>Chaque fiche porte un badge:</p>
+          <ul>
+            <li><b class="ok">Sourcée</b>: le déroulement suit une source qui le décrit étape par étape.</li>
+            <li><b class="moyen">Partiellement sourcée</b>: les sources confirment le principe, mais une partie est reconstituée (source très courte, forum, schéma illisible). La description dit ce qui a été interprété.</li>
+          </ul>
+          <p>Dans tous les cas:</p>
+          <ul>
+            <li>Le placement exact des joueurs est une illustration: les sources décrivent qui court où et qui passe à qui, rarement à quel mètre près.</li>
+            <li>Beaucoup de fiches danoises et allemandes nomment les défenseurs du point de vue de la défense. Elles ont été converties vers la gauche et la droite de l'attaque. Quand le texte d'une source contredit son schéma, la fiche suit le schéma et le signale.</li>
+            <li>Quelques variantes s'arrêtent sans tir, quand la source ne décrit pas de fin.</li>
+            <li>Les noms varient d'un club à l'autre: une même combinaison peut porter plusieurs noms (indiqués sous le titre), et un même nom peut désigner des combinaisons différentes (signalé dans la description).</li>
+          </ul>
+        </section>
+
+        <section class="carte">
+          <h3>D'où viennent les combinaisons</h3>
+          <ul>
+            <li><b>Danemark</b>: les fiches d'entraînement du club Dragør HK (Werner Fog-Hansen), dont la plupart ont été traduites en français par des clubs français, et leurs versions danoise et anglaise.</li>
+            <li><b>France</b>: la revue technique de la Fédération française de handball, "Approches du Handball" (n°108 à 214), les fiches "Tactique de match" d'entrainement-handball.fr, la série "C'est quoi...?" de Bogny Handball, des fiches de ligues et de comités.</li>
+            <li><b>Allemagne</b>: handballtraining.de, les archives de handballhaus.de, des documents de formation d'entraîneurs (fédération de Bavière, Unihandball) et le forum handballecke.de.</li>
+            <li><b>Espagne</b>: les travaux de Juan de Dios Román Seco et de Juan Antón, des articles de e-balonmano.com et de la fédération madrilène, l'analyse de la sélection espagnole, des forums d'entraîneurs.</li>
+            <li><b>République tchèque et Europe du Nord</b>: un mémoire de l'Université Charles de Prague sur les combinaisons de 6 équipes de 1re division, des publications d'entraîneurs scandinaves et des articles scientifiques.</li>
+          </ul>
+          <p>Chaque fiche liste ses sources, avec un lien et ce que dit la source. Sites les plus cités:</p>
+          <ul id="liste-domaines" class="domaines"></ul>
+        </section>
+
+        <section class="carte">
+          <h3>Limites</h3>
+          <ul>
+            <li>Les numéros 1 à 107 d'"Approches du Handball", les fiches payantes d'entrainement-handball.fr et les vidéos n'ont pas pu être exploités.</li>
+            <li>Certains liens (forum balonmano.mforos.com, calheat.com) refusent les robots mais s'ouvrent normalement dans un navigateur. Les pages de handballhaus.de, site fermé, sont citées via leurs archives.</li>
+            <li>Des combinaisons sont citées par leur nom dans les sources, sans description exploitable. Elles n'ont donc pas de fiche:</li>
+          </ul>
+          <p class="noms-sans-fiche">La Pamela, La Hongroise, La Banban, Göteborg, La Peaky, Yago Ciseaux, La Six à gauche (entrainement-handball.fr); Hep, London, Essen, Centrale, Islandais, Spanish, Double espagnol, criss/cross, Serbe, Sousse, Sortie poste pivot ("Approches du Handball"); la danesa, la polaca, fai-fai (forum espagnol); Check-Kreuzen, Polen H10, Freiwurf Tschechoslowakei 1970, Leipzig D09, Rostock rotieren 2 à 7, Russe, Jugo, Döner (sources allemandes); Kung-Fu arrière-ailier et ailier-arrière, et une dizaine d'autres fiches payantes.</p>
+          <p>Si tu connais l'une d'elles, ou si une fiche ne correspond pas à ce qui se joue dans ton club, signale-le.</p>
+        </section>
+
+        <section class="carte">
+          <h3>Proposer une correction</h3>
+          <p>Les données du site sont dans le dépôt GitHub: <a href="https://github.com/cesar-lizurey/combinaisons-handball">github.com/cesar-lizurey/combinaisons-handball</a>. Pour signaler une erreur, proposer une variante ou une combinaison manquante, ouvre un ticket dans <a href="https://github.com/cesar-lizurey/combinaisons-handball/issues">l'onglet "Issues"</a>, en précisant la fiche et, si possible, ta source. Le README du dépôt explique le format des fiches.</p>
+        </section>
+      </article>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/combinaisons.js"></script>
+  <!-- Lots supplémentaires: chaque fichier fait window.COMBINAISONS.push(...) -->
+  <script src="js/donnees/lot-1a.js"></script>
+  <script src="js/donnees/lot-2.js"></script>
+  <script src="js/donnees/lot-3a.js"></script>
+  <script src="js/donnees/lot-4a.js"></script>
+  <script src="js/donnees/lot-5a.js"></script>
+  <script src="js/donnees/lot-6a.js"></script>
+  <script src="js/donnees/lot-7a.js"></script>
+  <script src="js/donnees/lot-9a.js"></script>
+  <script src="js/donnees/lot-8a.js"></script>
+  <script src="js/donnees/lot-7b.js"></script>
+  <script src="js/donnees/lot-1b.js"></script>
+  <script src="js/donnees/lot-9b.js"></script>
+  <script src="js/donnees/lot-8b.js"></script>
+  <script src="js/donnees/lot-6b.js"></script>
+  <script src="js/donnees/lot-5b.js"></script>
+  <script src="js/donnees/lot-3b.js"></script>
+  <script src="js/donnees/lot-4b.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vue 3D - Combinaisons de handball</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23e8590c'/><path d='M4 16h24M16 2c5 4 5 24 0 28M16 2c-5 4-5 24 0 28' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <style>
+    :root {
+      --fond: #dfe5ec;
+      --surface: rgba(255, 255, 255, 0.92);
+      --texte: #1d232b;
+      --texte-doux: #5b6573;
+      --bordure: #dde1e7;
+      --accent: #e8590c;
+      --actif: #fff0e6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --surface: rgba(27, 33, 41, 0.92);
+        --texte: #e6e9ee;
+        --texte-doux: #9aa5b3;
+        --bordure: #2f3844;
+        --actif: #3a2416;
+      }
+    }
+    :root[data-theme="dark"] {
+      --surface: rgba(27, 33, 41, 0.92);
+      --texte: #e6e9ee;
+      --texte-doux: #9aa5b3;
+      --bordure: #2f3844;
+      --actif: #3a2416;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--fond);
+      color: var(--texte);
+      font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+    }
+    #scene { position: fixed; inset: 0; touch-action: none; }
+    #scene canvas { display: block; }
+    .panneau {
+      position: fixed;
+      background: var(--surface);
+      border: 1px solid var(--bordure);
+      border-radius: 10px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(6px);
+    }
+    .haut { top: 12px; left: 12px; right: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 8px 10px; }
+    .haut a { color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .haut select { flex: 1 1 220px; min-width: 0; max-width: 100%; }
+    .cameras { top: 70px; right: 12px; display: flex; flex-direction: column; gap: 6px; padding: 8px; }
+    .bas { left: 12px; right: 12px; bottom: 12px; padding: 10px 12px; max-width: 900px; margin: 0 auto; }
+    #texte { margin: 0 0 8px; min-height: 2.9em; }
+    .ligne { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    #curseur { flex: 1 1 160px; accent-color: var(--accent); }
+    button, select {
+      font: inherit;
+      color: var(--texte);
+      background: var(--surface);
+      border: 1px solid var(--bordure);
+      border-radius: 6px;
+      padding: 4px 9px;
+      cursor: pointer;
+    }
+    button[aria-pressed="true"] { border-color: var(--accent); background: var(--actif); }
+    button.principal { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 42px; }
+    .compteur { color: var(--texte-doux); font-size: 13px; white-space: nowrap; }
+    label { display: inline-flex; gap: 4px; align-items: center; font-size: 14px; white-space: nowrap; }
+    .aide { margin: 6px 0 0; color: var(--texte-doux); font-size: 12px; }
+    @media (max-width: 640px) {
+      .haut { top: 8px; left: 8px; right: 8px; }
+      .haut select { flex-basis: 100%; width: 100%; }
+      .cameras { top: auto; bottom: 182px; left: 8px; right: 8px; flex-direction: row; overflow-x: auto; }
+      .cameras button, .cameras label { flex: 0 0 auto; }
+      .bas { left: 8px; right: 8px; bottom: 8px; }
+      .aide { display: none; }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="scene" aria-label="Vue 3D de la combinaison"></div>
+
+  <div class="panneau haut">
+    <a href="./">Retour au site</a>
+    <select id="combo" aria-label="Combinaison"></select>
+    <select id="variante" aria-label="Variante"></select>
+  </div>
+
+  <div class="panneau cameras" role="group" aria-label="Caméra">
+    <button type="button" data-camera="attaque">Derrière l'attaque</button>
+    <button type="button" data-camera="dessus">Dessus</button>
+    <button type="button" data-camera="gardien">Gardien</button>
+    <button type="button" data-camera="cote">Côté</button>
+    <label><input type="checkbox" id="suivre"> Suivre le ballon</label>
+  </div>
+
+  <div class="panneau bas">
+    <p id="texte" aria-live="polite"></p>
+    <div class="ligne">
+      <button type="button" id="debut" title="Début (Origine)" aria-label="Début">⏮</button>
+      <button type="button" id="precedent" title="Étape précédente (flèche gauche)" aria-label="Étape précédente">◀◀</button>
+      <button type="button" id="lecture" class="principal" title="Lecture / pause (Espace)" aria-label="Lecture">▶</button>
+      <button type="button" id="suivant" title="Étape suivante (flèche droite)" aria-label="Étape suivante">▶▶</button>
+      <button type="button" id="fin" title="Fin" aria-label="Fin">⏭</button>
+      <span id="compteur" class="compteur"></span>
+      <input type="range" id="curseur" min="0" max="1" step="0.001" value="0" aria-label="Position dans la combinaison">
+    </div>
+    <div class="ligne" style="margin-top: 6px">
+      <label>Vitesse
+        <select id="vitesse">
+          <option value="0.5">x0,5</option>
+          <option value="1" selected>x1</option>
+          <option value="1.5">x1,5</option>
+          <option value="2">x2</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="opt-defense" checked> Défense</label>
+      <label><input type="checkbox" id="opt-traces" checked> Tracés</label>
+      <label><input type="checkbox" id="opt-etiquettes" checked> Étiquettes</label>
+    </div>
+    <p class="aide">Glisser pour tourner, molette ou pincer pour zoomer, clic droit ou deux doigts pour déplacer la vue.</p>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/combinaisons.js"></script>
+  <script src="js/donnees/lot-1a.js"></script>
+  <script src="js/donnees/lot-2.js"></script>
+  <script src="js/donnees/lot-3a.js"></script>
+  <script src="js/donnees/lot-4a.js"></script>
+  <script src="js/donnees/lot-5a.js"></script>
+  <script src="js/donnees/lot-6a.js"></script>
+  <script src="js/donnees/lot-7a.js"></script>
+  <script src="js/donnees/lot-9a.js"></script>
+  <script src="js/donnees/lot-8a.js"></script>
+  <script src="js/donnees/lot-7b.js"></script>
+  <script src="js/donnees/lot-1b.js"></script>
+  <script src="js/donnees/lot-9b.js"></script>
+  <script src="js/donnees/lot-8b.js"></script>
+  <script src="js/donnees/lot-6b.js"></script>
+  <script src="js/donnees/lot-5b.js"></script>
+  <script src="js/donnees/lot-3b.js"></script>
+  <script src="js/donnees/lot-4b.js"></script>
+  <script src="js/vue3d.js"></script>
+</body>
+</html>

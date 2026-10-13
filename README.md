@@ -16,6 +16,7 @@ Le répertoire compte 370 combinaisons et plus de 1 000 variantes, issues de sou
 - Défense affichable ou masquable (0-6, 5-1, 3-2-1, 4-2, individuelle), tracés des étapes précédentes.
 - Situations de supériorité ou d'infériorité numérique (joueurs exclus) et de jeu à 7 contre 6.
 - Variantes pour certaines combinaisons (par exemple les quatre fins de l'Espagnole).
+- Vue 3D de chaque combinaison (bouton "Vue 3D", page `3d.html?c=<id>`): joueurs animés (course, passe, réception, tir, écran, posture défensive), caméra libre, vues prédéfinies (derrière l'attaque, dessus, gardien, côté) et suivi du ballon ou d'un joueur. Elle utilise Three.js, chargé depuis un CDN.
 - Une page par combinaison, avec sa propre adresse: `.../c/yago/`, `.../c/espagnole/`, etc. (les anciens liens en `#yago` restent valables).
 
 ## Lancer en local
@@ -34,7 +35,7 @@ Le sitemap est publié à l'adresse `https://cesar-lizurey.github.io/combinaison
 
 ## Ajouter ou modifier une combinaison
 
-Les combinaisons sont dans [js/combinaisons.js](js/combinaisons.js) et dans les lots de [js/donnees/](js/donnees/) (chaque lot fait `window.COMBINAISONS.push(...)` et doit être déclaré dans `index.html`). Les dispositifs défensifs et les positions de départ sont dans [js/config.js](js/config.js). Le format est décrit en tête de js/combinaisons.js:
+Les combinaisons sont dans [js/combinaisons.js](js/combinaisons.js) et dans les lots de [js/donnees/](js/donnees/) (chaque lot fait `window.COMBINAISONS.push(...)` et doit être déclaré dans `index.html` et dans `3d.html`, ce que le vérificateur contrôle). Les dispositifs défensifs et les positions de départ sont dans [js/config.js](js/config.js). Le format est décrit en tête de js/combinaisons.js:
 
 - Repère en mètres: `x` va de -10 (touche gauche) à +10 (touche droite), `y` est la distance à la ligne de but (zone à 6 m, ligne des 9 m).
 - Attaquants: `AiG`, `ArG`, `DC`, `ArD`, `AiD`, `Piv`. Défenseurs: `G1`, `G2`, `G3`, `D3`, `D2`, `D1` (numérotés de l'extérieur vers le centre) et `GB`.

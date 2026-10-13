@@ -77,6 +77,7 @@
               <option value="2">x2</option>
             </select>
           </label>
+          <a id="lien-3d" class="bouton-3d" href="3d.html" title="Voir la combinaison en 3D, avec une caméra libre">Vue 3D</a>
         </div>
         <input type="range" id="curseur" min="0" max="1" step="0.001" value="0" aria-label="Position dans l'animation">
         <ul class="legende">
@@ -135,6 +136,7 @@
             <li>Flèche pleine: course. Flèche en tirets bleus: passe. Flèche rouge: tir. Trait en T au bout d'une course: écran ou bloc.</li>
             <li>Les commandes sous le schéma permettent de lire, de mettre en pause, d'avancer ou de reculer d'une étape, et le curseur de rembobiner. Au clavier: Espace, flèche gauche et flèche droite. Cliquer sur une étape de la liste la rejoue.</li>
             <li>Les joueurs exclus (supériorité ou infériorité numérique) ne sont pas affichés.</li>
+            <li>Le bouton "Vue 3D" montre la même combinaison sur un terrain en 3D. La caméra se tourne en glissant, se rapproche à la molette ou en pinçant, et propose des vues toutes prêtes (derrière l'attaque, de dessus, depuis le but, de côté). Elle peut suivre le ballon ou un joueur: il suffit de cliquer dessus. Les gestes (course, passe, réception, tir, écran) sont une illustration déduite du schéma.</li>
           </ul>
         </section>
 
@@ -187,6 +189,7 @@
   </div>
 
   <script src="js/config.js"></script>
+  <script src="js/timeline.js"></script>
   <script src="js/combinaisons.js"></script>
   <!-- Lots supplémentaires: chaque fichier fait window.COMBINAISONS.push(...) -->
   <script src="js/donnees/lot-1a.js"></script>

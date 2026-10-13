@@ -329,6 +329,19 @@ button, input, select { font: inherit; color: inherit; }
 .compteur { margin-left: 8px; color: var(--texte-doux); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
 .vitesse { margin-left: auto; font-size: 0.85rem; color: var(--texte-doux); display: inline-flex; align-items: center; gap: 6px; }
 .vitesse select { padding: 4px 6px; border: 1px solid var(--bordure); border-radius: 6px; background: var(--surface); }
+.bouton-3d {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.bouton-3d:hover { background: var(--accent-doux); }
 
 #curseur { width: 100%; margin: 12px 0 4px; accent-color: var(--accent); }
 
@@ -537,6 +550,7 @@ button, input, select { font: inherit; color: inherit; }
   .carte:not(.schema-carte) { padding: 16px; }
   .etapes button { min-height: 44px; }
   .vitesse select { min-height: 40px; }
+  .bouton-3d { height: 44px; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .a-propos .domaines { grid-template-columns: minmax(0, 1fr); }
 }

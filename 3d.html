@@ -94,7 +94,7 @@
   <div id="scene" aria-label="Vue 3D de la combinaison"></div>
 
   <div class="panneau haut">
-    <a href="./">Retour au site</a>
+    <a id="retour" href="./">Retour à la fiche</a>
     <select id="combo" aria-label="Combinaison"></select>
     <select id="variante" aria-label="Variante"></select>
   </div>
@@ -104,7 +104,7 @@
     <button type="button" data-camera="dessus">Dessus</button>
     <button type="button" data-camera="gardien">Gardien</button>
     <button type="button" data-camera="cote">Côté</button>
-    <label><input type="checkbox" id="suivre"> Suivre le ballon</label>
+    <label>Suivre <select id="suivre" aria-label="Suivre avec la caméra"></select></label>
   </div>
 
   <div class="panneau bas">
@@ -131,10 +131,11 @@
       <label><input type="checkbox" id="opt-traces" checked> Tracés</label>
       <label><input type="checkbox" id="opt-etiquettes" checked> Étiquettes</label>
     </div>
-    <p class="aide">Glisser pour tourner, molette ou pincer pour zoomer, clic droit ou deux doigts pour déplacer la vue.</p>
+    <p class="aide">Glisser pour tourner, molette ou pincer pour zoomer, clic droit ou deux doigts pour déplacer la vue. Cliquer sur un joueur pour le suivre.</p>
   </div>
 
   <script src="js/config.js"></script>
+  <script src="js/timeline.js"></script>
   <script src="js/combinaisons.js"></script>
   <script src="js/donnees/lot-1a.js"></script>
   <script src="js/donnees/lot-2.js"></script>

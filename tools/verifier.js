@@ -5,7 +5,8 @@
  * Charge les scripts de données listés dans index.html (tout sauf js/app.js), puis contrôle chaque
  * combinaison: champs obligatoires, joueurs connus, passes et tirs faits par le porteur du ballon,
  * joueurs hors de la zone des 6 m et dans le terrain. Les joueurs trop proches sont signalés en
- * avertissement. Code de sortie 1 s'il y a des erreurs.
+ * avertissement. Vérifie aussi que la vue 3D (3d.html) charge les mêmes données que index.html.
+ * Code de sortie 1 s'il y a des erreurs.
  */
 'use strict';
 
@@ -109,6 +110,15 @@ for (const c of COMBINAISONS) {
     });
     if (porteur !== null) avert(`${ouV}: se termine sans tir`);
   }
+}
+
+// La vue 3D doit charger les mêmes scripts de données, dans le même ordre.
+const scripts3d = [...fs.readFileSync(path.join(racine, '3d.html'), 'utf8').matchAll(/<script src="([^"]+)"/g)]
+  .map(m => m[1]).filter(s => !s.endsWith('vue3d.js'));
+const scriptsSite = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]).filter(s => !s.endsWith('app.js'));
+if (scripts3d.join() !== scriptsSite.join()) {
+  const manque = scriptsSite.filter(s => !scripts3d.includes(s));
+  erreurs.push(`[3d.html] scripts différents de index.html${manque.length ? ` (manquants: ${manque.join(', ')})` : ' (ordre ou fichiers en trop)'}`);
 }
 
 for (const a of avertissements) console.log(`avertissement ${a}`);

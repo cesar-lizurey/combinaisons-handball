@@ -4,6 +4,7 @@
  *
  * - une page par combinaison (c/<id>/index.html) et une page "À propos" (a-propos/index.html),
  *   dont le contenu est déjà écrit dans le HTML pour les moteurs de recherche;
+ * - la vue 3D (3d.html), reprise telle quelle;
  * - sitemap.xml (à déclarer dans Google Search Console et Bing Webmaster Tools: sur un site
  *   publié dans un sous-dossier, un robots.txt ne serait pas lu par les moteurs).
  * L'application (js/app.js) prend ensuite le relais dans le navigateur.
@@ -66,6 +67,7 @@ function page({ prefixe, titre, description, url, type = 'website', corps = h =>
     '<meta property="og:site_name" content="Combinaisons de handball">',
   ].join('\n  '));
   h = h.replace(/(href|src)="(css|js)\//g, `$1="${prefixe}$2/`);
+  h = h.replace('href="3d.html"', `href="${prefixe}3d.html"`);
   h = h.replace('<body>', `<body data-racine="${prefixe || './'}">`);
   h = h.replace(/href="\.\/" data-route=""/, `href="${prefixe || './'}" data-route=""`);
   h = h.replace(/href="#a-propos" data-route="a-propos"/g, `href="${prefixe}a-propos/" data-route="a-propos"`);
@@ -83,6 +85,7 @@ function preremplirFiche(h, c) {
   const v = c.variantes ? c.variantes[0] : null;
   const etapes = v ? v.etapes : c.etapes;
   h = remplir(h, 'titre', esc(c.nom));
+  h = h.replace(/(<a id="lien-3d"[^>]* href="[^"]*3d\.html)"/, `$1?c=${c.id}"`);
   h = remplir(h, 'alias', c.alias ? `Aussi appelée: ${esc(c.alias)}` : '');
   h = remplir(h, 'resume', esc(c.resume));
   h = remplir(h, 'variantes', (c.variantes || []).map(x => `<button type="button">${esc(x.nom)}</button>`).join(''));
@@ -100,6 +103,7 @@ function preremplirFiche(h, c) {
 fs.rmSync(sortie, { recursive: true, force: true });
 fs.mkdirSync(sortie, { recursive: true });
 for (const d of ['css', 'js']) fs.cpSync(path.join(racine, d), path.join(sortie, d), { recursive: true });
+fs.copyFileSync(path.join(racine, '3d.html'), path.join(sortie, '3d.html')); // vue 3D (hors sitemap, non indexée)
 
 const urls = [];
 const description = `Répertoire de ${C.length} combinaisons d'attaque en handball (croisés, Espagnole, Yago, Kempa, jeu avec le pivot, jets francs...), avec schémas animés étape par étape et sources.`;
